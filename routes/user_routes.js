@@ -80,4 +80,12 @@ router.patch('/change-password', reqToken, (req, res, next) => {
     .catch(next)
 })
 
+router.delete('/sign-out', reqToken, (req, res, next) => {
+    req.user.token = null
+
+    req.user.save()
+    .then(() => res.sendStatus(204))
+    .catch(next)
+})
+
 module.exports = router
