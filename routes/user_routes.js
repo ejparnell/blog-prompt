@@ -60,4 +60,24 @@ router.post('/sign-in', (req, res, next) => {
     .catch(next)
 })
 
+router.patch('/change-password', reqToken, (req, res, next) => {
+    let user 
+
+    User.findById(req.user.id)
+    .then(record => { user = record })
+    .then(() => bcrypt.compare(req.body.passwords.old, user.hashedPassword))
+    .then(correctPassword => {
+        if (!req.body.passwords.new || !correctPassword) {
+            throw new BadParamsError()
+        }
+    })
+    .then(() => bcrypt.hash(req.body.passwords.new, SALT_ROUNDS))
+    .then(hash => {
+        user.hashedPassword = hash
+        user.save()
+    })
+    .then(() => res.sendStatus(204))
+    .catch(next)
+})
+
 module.exports = router
